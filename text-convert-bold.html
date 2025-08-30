@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sans Bold / Italic Converter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Importar Montserrat -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white shadow-xl rounded-2xl p-6 w-full max-w-2xl">
+    <h1 class="text-white text-2xl mb-4 text-center bg-stone-900 rounded-md ">Jirasol Font</h1>
+
+    <textarea id="inputText" 
+      class="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      rows="3" placeholder="Escribe aquí..."></textarea>
+
+    <!-- Botones -->
+    <div class="flex flex-wrap gap-2 mb-4 justify-center">
+      <button onclick="convert('bold')" class="px-3 py-2 bg-stone-900 text-white rounded-lg hover:bg-rose-400">Sans Bold</button>
+      <button onclick="convert('italic')" class="px-3 py-2 bg-stone-900 text-white rounded-lg hover:bg-rose-400">Sans Italic</button>
+      <button onclick="convert('boldItalic')" class="px-3 py-2 bg-stone-900 text-white rounded-lg hover:bg-rose-400">Sans Bold Italic</button>
+    </div>
+
+    <!-- Vista previa -->
+    <div id="output" 
+      class="p-4 border rounded-lg min-h-[100px] break-words  text-center">
+      <div class="text-stone-500">
+        Vista previa aquí...
+      </div>
+    </div>
+
+    <!-- Botón copiar -->
+    <div class="mt-4 flex justify-center">
+      <button onclick="copyText()" 
+        class="flex items-center px-6 py-2 bg-stone-900 text-white rounded-lg hover:bg-stone-700">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="8" height="10" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+        Copiar</button>
+    </div>
+  </div>
+
+  <script>
+    // Mapeos Unicode
+    const boldMap = {
+      a:"𝗮", b:"𝗯", c:"𝗰", d:"𝗱", e:"𝗲", f:"𝗳", g:"𝗴", h:"𝗵", i:"𝗶", j:"𝗷", k:"𝗸", l:"𝗹", m:"𝗺",
+      n:"𝗻", o:"𝗼", p:"𝗽", q:"𝗾", r:"𝗿", s:"𝘀", t:"𝘁", u:"𝘂", v:"𝘃", w:"𝘄", x:"𝘅", y:"𝘆", z:"𝘇",
+      A:"𝗔", B:"𝗕", C:"𝗖", D:"𝗗", E:"𝗘", F:"𝗙", G:"𝗚", H:"𝗛", I:"𝗜", J:"𝗝", K:"𝗞", L:"𝗟", M:"𝗠",
+      N:"𝗡", O:"𝗢", P:"𝗣", Q:"𝗤", R:"𝗥", S:"𝗦", T:"𝗧", U:"𝗨", V:"𝗩", W:"𝗪", X:"𝗫", Y:"𝗬", Z:"𝗭"
+    };
+
+    const italicMap = {
+      a:"𝘢", b:"𝘣", c:"𝘤", d:"𝘥", e:"𝘦", f:"𝘧", g:"𝘨", h:"𝘩", i:"𝘪", j:"𝘫", k:"𝘬", l:"𝘭", m:"𝘮",
+      n:"𝘯", o:"𝘰", p:"𝘱", q:"𝘲", r:"𝘳", s:"𝘴", t:"𝘵", u:"𝘶", v:"𝘷", w:"𝘸", x:"𝘹", y:"𝘺", z:"𝘻",
+      A:"𝘈", B:"𝘉", C:"𝘊", D:"𝘋", E:"𝘌", F:"𝘍", G:"𝘎", H:"𝘏", I:"𝘐", J:"𝘑", K:"𝘒", L:"𝘓", M:"𝘔",
+      N:"𝘕", O:"𝘖", P:"𝘗", Q:"𝘘", R:"𝘙", S:"𝘚", T:"𝘛", U:"𝘜", V:"𝘝", W:"𝘞", X:"𝘟", Y:"𝘠", Z:"𝘡"
+    };
+
+    const boldItalicMap = {
+      a:"𝙖", b:"𝙗", c:"𝙘", d:"𝙙", e:"𝙚", f:"𝙛", g:"𝙜", h:"𝙝", i:"𝙞", j:"𝙟", k:"𝙠", l:"𝙡", m:"𝙢",
+      n:"𝙣", o:"𝙤", p:"𝙥", q:"𝙦", r:"𝙧", s:"𝙨", t:"𝙩", u:"𝙪", v:"𝙫", w:"𝙬", x:"𝙭", y:"𝙮", z:"𝙯",
+      A:"𝘼", B:"𝘽", C:"𝘾", D:"𝘿", E:"𝙀", F:"𝙁", G:"𝙂", H:"𝙃", I:"𝙄", J:"𝙅", K:"𝙆", L:"𝙇", M:"𝙈",
+      N:"𝙉", O:"𝙊", P:"𝙋", Q:"𝙌", R:"𝙍", S:"𝙎", T:"𝙏", U:"𝙐", V:"𝙑", W:"𝙒", X:"𝙓", Y:"𝙔", Z:"𝙕"
+    };
+
+    function convert(type) {
+      const text = document.getElementById("inputText").value;
+      let map;
+      if (type === "bold") map = boldMap;
+      else if (type === "italic") map = italicMap;
+      else if (type === "boldItalic") map = boldItalicMap;
+
+      const result = text.split("").map(ch => map[ch] || ch).join("");
+      document.getElementById("output").innerText = result;
+    }
+
+    function copyText() {
+      const text = document.getElementById("output").innerText;
+      navigator.clipboard.writeText(text);
+      
+    }
+  </script>
+</body>
+</html>
