@@ -22,21 +22,37 @@
     <h1 class="text-white text-2xl mb-4 text-center bg-stone-900 rounded-md ">Jirasol Font</h1>
 
     <textarea id="inputText"
-      class="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3"
+      class="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="5"
       placeholder="Escribe aquí..."></textarea>
 
     <!-- Botones -->
     <div class="flex flex-wrap gap-2 mb-4 justify-center">
-      <button onclick="convert('bold')" class="px-3 py-2 bg-stone-900 text-white rounded-lg hover:bg-rose-400">Sans
-        Bold</button>
-      <button onclick="convert('italic')" class="px-3 py-2 bg-stone-900 text-white rounded-lg hover:bg-rose-400">Sans
-        Italic</button>
-      <button onclick="convert('boldItalic')"
-        class="px-3 py-2 bg-stone-900 text-white rounded-lg hover:bg-rose-400">Sans Bold Italic</button>
+      <button onclick="convert('bold','lagazzetta')"
+        class="px-3 py-2 bg-stone-900 text-white rounded-lg hover:bg-rose-400">
+        Sans Bold
+      </button>
+      <button onclick="convert('italic','lagazzetta')"
+        class="px-3 py-2 bg-stone-900 text-white rounded-lg hover:bg-rose-400">
+        Sans Italic
+      </button>
+      <button onclick="convert('boldItalic','lagazzetta')"
+        class="px-3 py-2 bg-stone-900 text-white rounded-lg hover:bg-rose-400">
+        Sans Bold Italic
+      </button>
+
+      <!-- Botones nuevos -->
+      <button onclick="convert('bold','arequipa')"
+        class="px-3 py-2 bg-stone-900 text-white rounded-lg hover:bg-emerald-500">
+        Arequipa
+      </button>
+      <button onclick="convert('bold','moquegua')"
+        class="px-3 py-2 bg-stone-900 text-white rounded-lg hover:bg-indigo-500">
+        Moquegua
+      </button>
     </div>
 
     <!-- Vista previa -->
-    <div id="output" class="p-4 border rounded-lg min-h-[100px] break-words  text-center">
+    <div id="output" class="p-4 border rounded-lg min-h-[100px] break-words text-center">
       <div class="text-stone-500">
         Vista previa aquí...
       </div>
@@ -48,7 +64,7 @@
         class="flex items-center px-6 py-2 bg-stone-900 text-white rounded-lg hover:bg-stone-700">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-          class="lucide lucide-copy-icon lucide-copy">
+          class="lucide lucide-copy">
           <rect width="8" height="10" x="8" y="8" rx="2" ry="2" />
           <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
         </svg>
@@ -79,24 +95,37 @@
       N: "𝙉", O: "𝙊", P: "𝙋", Q: "𝙌", R: "𝙍", S: "𝙎", T: "𝙏", U: "𝙐", V: "𝙑", W: "𝙒", X: "𝙓", Y: "𝙔", Z: "𝙕"
     };
 
-    function convert(type) {
+    function applyMap(text, map) {
+      return text.split("").map(ch => map[ch] || ch).join("");
+    }
+
+    function convert(type, mode) {
       const text = document.getElementById("inputText").value;
+
       let map;
       if (type === "bold") map = boldMap;
       else if (type === "italic") map = italicMap;
       else if (type === "boldItalic") map = boldItalicMap;
 
-      const converted = text.split("").map(ch => map[ch] || ch).join("");
-      const result = "#LaGazzetta👇📧⚡ " + converted;
+      // Buscar párrafo entre *...*
+      let converted = text.replace(/\*(.*?)\*/s, (match, p1) => {
+        if (mode === "moquegua") {
+          // convertir a minúsculas antes de aplicar el mapa
+          return "*" + applyMap(p1.toLowerCase(), map) + "*";
+        } else {
+          return "*" + applyMap(p1, map) + "*";
+        }
+      });
+
+      // Prefijos según botón
+      let prefix = "#LaGazzetta👇📧⚡ ";
+      if (mode === "arequipa") prefix = "#Arequipa #LaGazzetta👇📧⚡ ";
+      if (mode === "moquegua") prefix = "#Moquegua #LaGazzetta👇📧⚡ ";
+
+      const result = prefix + converted;
       document.getElementById("output").innerText = result;
     }
 
-
-    function copyText() {
-      const text = document.getElementById("output").innerText;
-      navigator.clipboard.writeText(text);
-
-    }
   </script>
 </body>
 
