@@ -5,15 +5,15 @@
   <title>Conversor</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-6">
-  <div class="max-w-3xl mx-auto bg-white p-6 rounded-2xl shadow-lg">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-3xl bg-white p-6 rounded-2xl shadow-lg">
     <h1 class="text-2xl font-bold mb-4 text-center text-gray-800">Conversor de Texto</h1>
 
     <textarea id="inputText" rows="8" 
       class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none mb-4" 
       placeholder="Escribe aquí..."></textarea>
 
-    <div class="flex flex-wrap gap-2 mb-4">
+    <div class="flex flex-wrap gap-2 mb-4 justify-center">
       <button onclick="convert('bold')" class="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600">Sans Bold</button>
       <button onclick="convert('italic')" class="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600">Sans Italic</button>
       <button onclick="convert('boldItalic')" class="px-4 py-2 bg-purple-500 text-white rounded-lg shadow hover:bg-purple-600">Sans Bold Italic</button>
@@ -27,16 +27,18 @@
   </div>
 
   <script>
-    // Mapas de estilos (ejemplo)
+    // Mapas de estilos
     const boldMap = {
       "a":"𝗮","b":"𝗯","c":"𝗰","d":"𝗱","e":"𝗲","f":"𝗳","g":"𝗴","h":"𝗵","i":"𝗶","j":"𝗷","k":"𝗸","l":"𝗹","m":"𝗺",
-      "n":"𝗻","o":"𝗼","p":"𝗽","q":"𝗾","r":"𝗿","s":"𝘀","t":"𝘁","u":"𝘂","v":"𝘃","w":"𝘄","x":"𝘅","y":"𝘆","z":"𝘇"
+      "n":"𝗻","o":"𝗼","p":"𝗽","q":"𝗾","r":"𝗿","s":"𝘀","t":"𝘁","u":"𝘂","v":"𝘃","w":"𝘄","x":"𝘅","y":"𝘆","z":"𝘇",
+      "A":"𝗔","B":"𝗕","C":"𝗖","D":"𝗗","E":"𝗘","F":"𝗙","G":"𝗚","H":"𝗛","I":"𝗜","J":"𝗝","K":"𝗞","L":"𝗟","M":"𝗠",
+      "N":"𝗡","O":"𝗢","P":"𝗣","Q":"𝗤","R":"𝗥","S":"𝗦","T":"𝗧","U":"𝗨","V":"𝗩","W":"𝗪","X":"𝗫","Y":"𝗬","Z":"𝗭"
     };
     const italicMap = {};      
     const boldItalicMap = {};  
 
     function applyMap(text, map) {
-      return text.split("").map(ch => map[ch.toLowerCase()] || ch).join("");
+      return text.split("").map(ch => map[ch] || ch).join("");
     }
 
     function convert(type, mode) {
@@ -47,40 +49,49 @@
       else if (type === "italic") map = italicMap;
       else if (type === "boldItalic") map = boldItalicMap;
 
-      // separar párrafos
       const parts = text.split("\n");
       let firstParagraph = parts[0];
 
       if (mode === "moquegua") {
         firstParagraph = firstParagraph.toLowerCase();
+        firstParagraph = firstParagraph.charAt(0).toUpperCase() + firstParagraph.slice(1);
       }
 
-      // aplicar solo al primer párrafo
       parts[0] = applyMap(firstParagraph, map);
-
       let converted = parts.join("\n");
 
-      // prefijo
       let prefix = "#LaGazzetta👇📧⚡ ";
       if (mode === "arequipa") prefix = "#Arequipa #LaGazzetta👇📧⚡ ";
       if (mode === "moquegua") prefix = "#Moquegua #LaGazzetta👇📧⚡ ";
 
       const result = prefix + converted;
       document.getElementById("output").textContent = result;
+
+      // copiar automáticamente para Arequipa y Moquegua
+      if (mode === "arequipa" || mode === "moquegua") {
+        copyToClipboard(result);
+      }
     }
 
     function copyText() {
       const text = document.getElementById("output").textContent;
+      copyToClipboard(text);
+    }
+
+    function copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(() => {
-        // notificación simple con Tailwind
-        const toast = document.createElement("div");
-        toast.textContent = "✅ Texto copiado al portapapeles";
-        toast.className = "fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg animate-bounce";
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2000);
+        showToast("✅ Texto copiado al portapapeles");
       }).catch(err => {
         console.error("❌ Error al copiar: ", err);
       });
+    }
+
+    function showToast(message) {
+      const toast = document.createElement("div");
+      toast.textContent = message;
+      toast.className = "fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg animate-bounce";
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2000);
     }
   </script>
 </body>
