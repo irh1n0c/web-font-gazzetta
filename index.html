@@ -100,31 +100,36 @@
     }
 
     function convert(type, mode) {
-      const text = document.getElementById("inputText").value;
+  const text = document.getElementById("inputText").value;
 
-      let map;
-      if (type === "bold") map = boldMap;
-      else if (type === "italic") map = italicMap;
-      else if (type === "boldItalic") map = boldItalicMap;
+  let map;
+  if (type === "bold") map = boldMap;
+  else if (type === "italic") map = italicMap;
+  else if (type === "boldItalic") map = boldItalicMap;
 
-      // Buscar párrafo entre *...*
-      let converted = text.replace(/\*(.*?)\*/s, (match, p1) => {
-        if (mode === "moquegua") {
-          // convertir a minúsculas antes de aplicar el mapa
-          return "*" + applyMap(p1.toLowerCase(), map) + "*";
-        } else {
-          return "*" + applyMap(p1, map) + "*";
-        }
-      });
+  // separar primer párrafo (hasta primer salto de línea)
+  const parts = text.split("\n");
+  let firstParagraph = parts[0];
+  
+  if (mode === "moquegua") {
+    firstParagraph = firstParagraph.toLowerCase(); // forzar a minúsculas
+  }
 
-      // Prefijos según botón
-      let prefix = "#LaGazzetta👇📧⚡ ";
-      if (mode === "arequipa") prefix = "#Arequipa #LaGazzetta👇📧⚡ ";
-      if (mode === "moquegua") prefix = "#Moquegua #LaGazzetta👇📧⚡ ";
+  // aplicar estilo solo al primer párrafo
+  parts[0] = applyMap(firstParagraph, map);
 
-      const result = prefix + converted;
-      document.getElementById("output").innerText = result;
-    }
+  // unir texto nuevamente
+  let converted = parts.join("\n");
+
+  // prefijos según botón
+  let prefix = "#LaGazzetta👇📧⚡ ";
+  if (mode === "arequipa") prefix = "#Arequipa #LaGazzetta👇📧⚡ ";
+  if (mode === "moquegua") prefix = "#Moquegua #LaGazzetta👇📧⚡ ";
+
+  const result = prefix + converted;
+  document.getElementById("output").innerText = result;
+}
+
 
   </script>
 </body>
